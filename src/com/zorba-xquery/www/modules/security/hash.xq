@@ -18,6 +18,7 @@
  : This is the description of the hash module
  :
  : @author Gabriel Petrovay, Markus Pilman
+ : @project security
  :
  :)
 module namespace hash = "http://www.zorba-xquery.com/modules/security/hash";
