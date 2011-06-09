@@ -22,7 +22,7 @@
 #include <zorba/zorba.h>
 #include <zorba/error.h>
 #include <zorba/external_module.h>
-#include <zorba/external_function.h>
+#include <zorba/function.h>
 
 namespace zorba { namespace security {
 
@@ -42,7 +42,7 @@ namespace zorba { namespace security {
           }
       };
 
-      typedef std::map<String, StatelessExternalFunction*, ltstr> FuncMap_t;
+      typedef std::map<String, ExternalFunction*, ltstr> FuncMap_t;
       FuncMap_t theFunctions;
   
     public:
@@ -51,7 +51,7 @@ namespace zorba { namespace security {
       virtual String
       getURI() const { return "http://www.zorba-xquery.com/modules/security/hmac"; }
   
-      virtual StatelessExternalFunction*
+      virtual ExternalFunction*
       getExternalFunction(const String& aLocalname);
 
       virtual void
@@ -67,7 +67,7 @@ namespace zorba { namespace security {
 
   };
 
-  class HMACSHA1Function : public PureStatelessExternalFunction
+  class HMACSHA1Function : public NonContextualExternalFunction
   {
     protected:
       const HMACModule* theModule;

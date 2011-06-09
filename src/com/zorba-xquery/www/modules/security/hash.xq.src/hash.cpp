@@ -34,7 +34,7 @@ namespace zorba { namespace security {
 
 zorba::String getOneStringArgument(
     const HashModule* aModule,
-    const StatelessExternalFunction::Arguments_t& aArgs,
+    const ExternalFunction::Arguments_t& aArgs,
     int aIndex)
 {
   zorba::Item lItem;
@@ -63,7 +63,7 @@ zorba::String getOneStringArgument(
 
 static zorba::String getNodeText(
     const HashModule* aModule,
-    const StatelessExternalFunction::Arguments_t&  aArgs,
+    const ExternalFunction::Arguments_t&  aArgs,
     int                 aArgumentIndex)
 {
   zorba::Item lItem;
@@ -108,7 +108,7 @@ HashModule::destroy()
   delete this;
 }
 
-class HashFunction : public PureStatelessExternalFunction
+class HashFunction : public NonContextualExternalFunction
 {
 protected:
   const HashModule* theModule;
@@ -158,10 +158,10 @@ public:
 
 };
 
-StatelessExternalFunction* HashModule::getExternalFunction(const 
+ExternalFunction* HashModule::getExternalFunction(const 
     String& aLocalname)
 {
-  StatelessExternalFunction*& lFunc = theFunctions[aLocalname];
+  ExternalFunction*& lFunc = theFunctions[aLocalname];
   if (!lFunc) {
     if (!aLocalname.compare("hash-unchecked")) {
       lFunc = new HashFunction(this);

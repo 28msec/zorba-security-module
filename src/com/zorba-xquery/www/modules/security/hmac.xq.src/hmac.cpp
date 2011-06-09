@@ -30,7 +30,7 @@ namespace zorba { namespace security {
 
   ItemFactory* HMACModule::theFactory = 0;
 
-  zorba::String getOneStringArgument(const StatelessExternalFunction::Arguments_t& aArgs, int aIndex)
+  zorba::String getOneStringArgument(const ExternalFunction::Arguments_t& aArgs, int aIndex)
   {
     zorba::Item lItem;
     Iterator_t args_iter = aArgs[aIndex]->getIterator();
@@ -66,10 +66,10 @@ HMACModule::~HMACModule()
   theFunctions.clear();
 }
   
-StatelessExternalFunction*
+ExternalFunction*
 HMACModule::getExternalFunction(const String& aLocalname)
 {
-  StatelessExternalFunction*& lFunc = theFunctions[aLocalname];
+  ExternalFunction*& lFunc = theFunctions[aLocalname];
   if (!lFunc) {
     if (aLocalname.compare("sha1")) {
       lFunc = new HMACSHA1Function(this);

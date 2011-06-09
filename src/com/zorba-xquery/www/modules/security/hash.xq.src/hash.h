@@ -41,7 +41,7 @@ namespace zorba { namespace security {
 			}
 		};
 		
-		typedef std::map<String, StatelessExternalFunction*, ltstr> FuncMap_t;
+		typedef std::map<String, ExternalFunction*, ltstr> FuncMap_t;
 		FuncMap_t theFunctions;
 		
     public:
@@ -50,7 +50,7 @@ namespace zorba { namespace security {
 		virtual String
 		getURI() const { return "http://www.zorba-xquery.com/modules/security/hash"; }
 		
-		virtual StatelessExternalFunction*
+		virtual ExternalFunction*
 		getExternalFunction(const String& aLocalname);
 		
 		virtual void
@@ -66,7 +66,7 @@ namespace zorba { namespace security {
 		
 	};
 	
-	class HashSHA1Function : public PureStatelessExternalFunction
+	class HashSHA1Function : public NonContextualExternalFunction
 	{
     protected:
 		const HashModule* theModule;
