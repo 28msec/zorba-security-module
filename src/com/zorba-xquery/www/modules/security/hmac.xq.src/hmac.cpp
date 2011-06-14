@@ -71,7 +71,7 @@ HMACModule::getExternalFunction(const String& aLocalname)
 {
   ExternalFunction*& lFunc = theFunctions[aLocalname];
   if (!lFunc) {
-    if (aLocalname.compare("sha1")) {
+    if (!aLocalname.compare("sha1")) {
       lFunc = new HMACSHA1Function(this);
     }
   }
