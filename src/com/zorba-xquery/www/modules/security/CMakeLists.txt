@@ -12,6 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-GENERATE_MODULE_LIBRARY(hmac "")
-
-GENERATE_MODULE_LIBRARY(hash "")
+DECLARE_ZORBA_MODULE("http://www.zorba-xquery.com/modules/security/hmac" 1.0 "hmac.xq")
+DECLARE_ZORBA_MODULE("http://www.zorba-xquery.com/modules/security/hash" 1.0 "hash.xq")

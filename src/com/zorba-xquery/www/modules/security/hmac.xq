@@ -23,6 +23,9 @@
  :)
 module namespace hmac = "http://www.zorba-xquery.com/modules/security/hmac";
 
+declare namespace ver = "http://www.zorba-xquery.com/options/versioning";
+declare option ver:module-version "1.0";
+
 (:~
  : This function provides hash-based message authentication using
  : the sha1 algorithm.

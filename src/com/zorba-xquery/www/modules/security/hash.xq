@@ -23,6 +23,9 @@
  :)
 module namespace hash = "http://www.zorba-xquery.com/modules/security/hash";
 
+declare namespace ver = "http://www.zorba-xquery.com/options/versioning";
+declare option ver:module-version "1.0";
+
 (:~
  : Computes the MD5 hash of the text content of the node provided as parameter.
  :
