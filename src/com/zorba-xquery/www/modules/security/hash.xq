@@ -18,10 +18,10 @@
  : This is the description of the hash module
  :
  : @author Gabriel Petrovay, Markus Pilman
- : @project security
+ : @project cryptography
  :
  :)
-module namespace hash = "http://www.zorba-xquery.com/modules/security/hash";
+module namespace hash = "http://www.zorba-xquery.com/modules/cryptography/hash";
 
 declare namespace ver = "http://www.zorba-xquery.com/options/versioning";
 declare option ver:module-version "1.0";

@@ -18,10 +18,10 @@
  : This is the description of the hmac module
  :
  : @author William Candillon
- : @project security
+ : @project cryptography
  :
  :)
-module namespace hmac = "http://www.zorba-xquery.com/modules/security/hmac";
+module namespace hmac = "http://www.zorba-xquery.com/modules/cryptography/hmac";
 
 declare namespace ver = "http://www.zorba-xquery.com/options/versioning";
 declare option ver:module-version "1.0";

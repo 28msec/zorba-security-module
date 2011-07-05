@@ -48,7 +48,7 @@ namespace zorba { namespace security {
 		virtual ~HashModule();
 		
 		virtual String
-		getURI() const { return "http://www.zorba-xquery.com/modules/security/hash"; }
+		getURI() const { return "http://www.zorba-xquery.com/modules/cryptography/hash"; }
 		
 		virtual ExternalFunction*
 		getExternalFunction(const String& aLocalname);

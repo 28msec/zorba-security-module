@@ -39,7 +39,7 @@ namespace zorba { namespace security {
       std::stringstream lErrorMessage;
       lErrorMessage << "An empty-sequence is not allowed as "
                     << aIndex << ". parameter.";
-      Item lQName = Zorba::getInstance(0)->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/security/hmac",
+      Item lQName = Zorba::getInstance(0)->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/cryptography/hmac",
           "XPTY0004");
       throw USER_EXCEPTION(lQName, lErrorMessage.str() );
     }
@@ -48,7 +48,7 @@ namespace zorba { namespace security {
       std::stringstream lErrorMessage;
       lErrorMessage << "A sequence of more then one item is not allowed as "
         << aIndex << ". parameter.";
-      Item lQName = Zorba::getInstance(0)->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/security/hmac",
+      Item lQName = Zorba::getInstance(0)->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/cryptography/hmac",
           "XPTY0004");
       throw USER_EXCEPTION(lQName, lErrorMessage.str() );
     }

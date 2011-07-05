@@ -44,7 +44,7 @@ zorba::String getOneStringArgument(
     std::stringstream lErrorMessage;
     lErrorMessage << "An empty-sequence is not allowed as "
                   << aIndex << ". parameter.";
-    Item lQName = aModule->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/security/hash",
+    Item lQName = aModule->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/cryptography/hash",
         "XPTY0004");
     throw USER_EXCEPTION(lQName, lErrorMessage.str() );
   }
@@ -53,7 +53,7 @@ zorba::String getOneStringArgument(
     std::stringstream lErrorMessage;
     lErrorMessage << "A sequence of more then one item is not allowed as "
       << aIndex << ". parameter.";
-    Item lQName = aModule->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/security/hash",
+    Item lQName = aModule->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/cryptography/hash",
         "XPTY0004");
     throw USER_EXCEPTION(lQName, lErrorMessage.str() );
   }
@@ -72,7 +72,7 @@ static zorba::String getNodeText(
   if (!(args_iter->next(lItem))) {
     std::stringstream lErrorMessage;
     lErrorMessage << "An empty-sequence is not allowed as " << aArgumentIndex << ". parameter.";
-    Item lQName = aModule->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/security/hash",
+    Item lQName = aModule->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/cryptography/hash",
         "XPTY0004");
     throw USER_EXCEPTION(lQName, lErrorMessage.str() );
   }
@@ -81,7 +81,7 @@ static zorba::String getNodeText(
   if (args_iter->next(lItem)) {
     std::stringstream lErrorMessage;
     lErrorMessage << "A sequence of more then one item is not allowed as " << aArgumentIndex << ". parameter.";
-    Item lQName = aModule->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/security/hash",
+    Item lQName = aModule->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/cryptography/hash",
         "XPTY0004");
     throw USER_EXCEPTION(lQName, lErrorMessage.str() );
   }
