@@ -19,7 +19,7 @@
 #include <sstream>
 
 #include <zorba/base64.h>
-#include <zorba/error_list.h>
+#include <zorba/diagnostic_list.h>
 #include <zorba/item_factory.h>
 #include <zorba/singleton_item_sequence.h>
 #include <zorba/user_exception.h>

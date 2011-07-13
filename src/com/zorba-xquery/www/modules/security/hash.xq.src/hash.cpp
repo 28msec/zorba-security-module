@@ -18,7 +18,7 @@
 #include <map>
 
 #include <zorba/base64.h>
-#include <zorba/error_list.h>
+#include <zorba/diagnostic_list.h>
 #include <zorba/external_module.h>
 #include <zorba/user_exception.h>
 #include <zorba/item_factory.h>
