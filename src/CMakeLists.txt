@@ -12,8 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# all external module libraries are generated in the directory
-# of the corresponding .xq file
-MESSAGE(STATUS "Add com")
-ADD_SUBDIRECTORY(com)
-MESSAGE(STATUS "End modules")
+DECLARE_ZORBA_MODULE (URI "http://www.zorba-xquery.com/modules/cryptography/hmac" VERSION 1.0 FILE "hmac.xq")
+DECLARE_ZORBA_MODULE (URI "http://www.zorba-xquery.com/modules/cryptography/hash" VERSION 1.0 FILE "hash.xq")
