@@ -92,7 +92,8 @@ namespace zorba { namespace security {
 		getURI() const;
 		
 	};
-} /* namespace security */ } /* namespace zorba */
+
+} /* namespace security */ 
+} /* namespace zorba */
 
 #endif
-

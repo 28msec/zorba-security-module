@@ -17,11 +17,10 @@ xquery version "3.0";
 :)
 
 (:~
- : This is the description of the hash module
+ : This module provides access to functions that perform different hash operations.
  :
  : @author Gabriel Petrovay, Markus Pilman
  : @project cryptography
- :
  :)
 module namespace hash = "http://www.zorba-xquery.com/modules/cryptography/hash";
 
@@ -29,35 +28,35 @@ declare namespace ver = "http://www.zorba-xquery.com/options/versioning";
 declare option ver:module-version "1.0";
 
 (:~
- : Computes the MD5 hash of the text content of the node provided as parameter.
+ : Computes the MD5 hash of the string provided as parameter.
  :
- : @param $value The node whose text content will be hashed.
- : @return The MD5 hash of the node's text content.
+ : @param $value The string to hash.
+ : @return The MD5 hash of the provided string.
  :)
 declare function hash:md5($value as xs:string) as xs:string
 {
-  hash:hash-unchecked(<a>{$value}</a>, "md5")
+  hash:hash-impl($value, "md5")
 };
 
 (:~
- : Computes the SHA1 hash of the text content of the node provided as parameter.
+ : Computes the SHA1 hash of the string provided as parameter.
  :
- : @param $value The node whose text content will be hashed.
- : @return The SHA1 hash of the node's text content.
+ : @param $value The string to hash.
+ : @return The SHA1 hash of the provided string.
  :)
 declare function hash:sha1($value as xs:string) as xs:string
 {
-  hash:hash-unchecked(<a>{$value}</a>, "sha1")
+  hash:hash-impl($value, "sha1")
 };
 
 (:~
  : This function is only used internally and should not be called directly by the
- : user - it does not check, if the requested algorithm is supported.
+ : user.
  :
- : @param $value The node whose text content will be hashed.
+ : @param $value The string to be hashed.
  : @param $alg The algorithm to use for this hashing operation. Currently only
- :        "MD5" and "SHA1" algorithms are available. This parameter is case insensitive.
- : @return The MD5 hash of the node's text content.
+ :        "md5" and "sha1" algorithms are available.
+ : @return The hash of the provided string. If <code>$alg</code> is not a valid
+ :         algorithm name, the MD5 hash will be returned.
  :)
-declare %private function hash:hash-unchecked($value as node(), $alg as xs:string) as xs:string external;
-
+declare %private function hash:hash-impl($value as xs:string, $alg as xs:string) as xs:string external;

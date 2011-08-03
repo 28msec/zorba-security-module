@@ -61,34 +61,6 @@ zorba::String getOneStringArgument(
   return lTmpString;
 }
 
-static zorba::String getNodeText(
-    const HashModule* aModule,
-    const ExternalFunction::Arguments_t&  aArgs,
-    int                 aArgumentIndex)
-{
-  zorba::Item lItem;
-  Iterator_t args_iter = aArgs[aArgumentIndex]->getIterator();
-  args_iter->open();
-  if (!(args_iter->next(lItem))) {
-    std::stringstream lErrorMessage;
-    lErrorMessage << "An empty-sequence is not allowed as " << aArgumentIndex << ". parameter.";
-    Item lQName = aModule->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/cryptography/hash",
-        "XPTY0004");
-    throw USER_EXCEPTION(lQName, lErrorMessage.str() );
-  }
-  std::stringstream lTmpStream;
-  zorba::String lText = lItem.getStringValue();
-  if (args_iter->next(lItem)) {
-    std::stringstream lErrorMessage;
-    lErrorMessage << "A sequence of more then one item is not allowed as " << aArgumentIndex << ". parameter.";
-    Item lQName = aModule->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/cryptography/hash",
-        "XPTY0004");
-    throw USER_EXCEPTION(lQName, lErrorMessage.str() );
-  }
-  args_iter->close();
-  return lText;
-}
-
 HashModule::~HashModule()
 {
   for (FuncMap_t::const_iterator lIter = theFunctions.begin();
@@ -118,13 +90,13 @@ public:
   ~HashFunction(){}
 
   virtual String
-  getLocalName() const { return "hash-unchecked"; }
+  getLocalName() const { return "hash-impl"; }
 
   virtual zorba::ItemSequence_t
   evaluate(const Arguments_t& aArgs) const
   {
-    std::string lText = (getNodeText(theModule, aArgs, 0)).c_str();
-    std::string lAlg = (getOneStringArgument(theModule, aArgs, 1)).c_str();
+    zorba::String lText = getOneStringArgument(theModule, aArgs, 0);
+    zorba::String lAlg = getOneStringArgument(theModule, aArgs, 1);
     zorba::String lHash;
     if (lAlg == "sha1") {
       CSHA1 lSha1;
@@ -142,7 +114,7 @@ public:
 
       lHash = zorba::encoding::Base64::encode(lTmp);
     } else {
-      lHash = md5(lText);
+      lHash = md5(lText.str());
     }
     // implement here
     zorba::Item lItem;
@@ -163,7 +135,7 @@ ExternalFunction* HashModule::getExternalFunction(const
 {
   ExternalFunction*& lFunc = theFunctions[aLocalname];
   if (!lFunc) {
-    if (!aLocalname.compare("hash-unchecked")) {
+    if (!aLocalname.compare("hash-impl")) {
       lFunc = new HashFunction(this);
     }
   }
@@ -172,8 +144,8 @@ ExternalFunction* HashModule::getExternalFunction(const
 
 ItemFactory* HashModule::theFactory = 0;
 
-
-} /* namespace security */ } /* namespace zorba */
+} /* namespace security */
+} /* namespace zorba */
 
 #ifdef WIN32
 #  define DLL_EXPORT __declspec(dllexport)
