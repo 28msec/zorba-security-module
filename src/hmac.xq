@@ -17,7 +17,9 @@ xquery version "1.0";
 :)
 
 (:~
- : This is the description of the hmac module
+ : This module provides a function to generate hash-based
+ : message authentication codes (HMAC) involving a cryptographic
+ : hash function (e.g. SHA1).
  :
  : @author William Candillon
  : @project cryptography
@@ -29,12 +31,12 @@ declare namespace ver = "http://www.zorba-xquery.com/options/versioning";
 declare option ver:module-version "1.0";
 
 (:~
- : This function provides hash-based message authentication using
- : the sha1 algorithm.
+ : This function provides hash-based message authentication code using
+ : the SHA1 algorithm.
  : 
  : @param $message the message to be authenticated
  : @param $secret-key the secret key used for calculating the authentication
- : @return hash-based message authentication code
+ : @return hash-based base64 encoded message authentication code
  :)
 declare function hmac:sha1(
   $message as xs:string,

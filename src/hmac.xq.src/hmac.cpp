@@ -35,23 +35,8 @@ namespace zorba { namespace security {
     zorba::Item lItem;
     Iterator_t args_iter = aArgs[aIndex]->getIterator();
     args_iter->open();
-    if (!(args_iter->next(lItem))) {
-      std::stringstream lErrorMessage;
-      lErrorMessage << "An empty-sequence is not allowed as "
-                    << aIndex << ". parameter.";
-      Item lQName = Zorba::getInstance(0)->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/cryptography/hmac",
-          "XPTY0004");
-      throw USER_EXCEPTION(lQName, lErrorMessage.str() );
-    }
+    args_iter->next(lItem); // must have one because the signature is defined like this
     zorba::String lTmpString = lItem.getStringValue();
-    if (args_iter->next(lItem)) {
-      std::stringstream lErrorMessage;
-      lErrorMessage << "A sequence of more then one item is not allowed as "
-        << aIndex << ". parameter.";
-      Item lQName = Zorba::getInstance(0)->getItemFactory()->createQName("http://www.zorba-xquery.com/modules/cryptography/hmac",
-          "XPTY0004");
-      throw USER_EXCEPTION(lQName, lErrorMessage.str() );
-    }
     args_iter->close();
     return lTmpString;
   }

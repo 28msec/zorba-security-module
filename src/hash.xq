@@ -1,4 +1,4 @@
-xquery version "3.0";
+xquery version "1.0";
 
 (:
  : Copyright 2006-2009 The FLWOR Foundation.
@@ -17,7 +17,7 @@ xquery version "3.0";
 :)
 
 (:~
- : This module provides access to functions that perform different hash operations.
+ : This module provides functions that perform different hash operations.
  :
  : @author Gabriel Petrovay, Markus Pilman
  : @project cryptography
@@ -42,7 +42,7 @@ declare function hash:md5($value as xs:string) as xs:string
  : Computes the SHA1 hash of the string provided as parameter.
  :
  : @param $value The string to hash.
- : @return The SHA1 hash of the provided string.
+ : @return The base64 encoded SHA1 hash of the provided string.
  :)
 declare function hash:sha1($value as xs:string) as xs:string
 {
@@ -50,13 +50,14 @@ declare function hash:sha1($value as xs:string) as xs:string
 };
 
 (:~
- : This function is only used internally and should not be called directly by the
- : user.
+ : This function computes a hash value of the string provided as parameter.
+ : The function expects the hash algorithm to be used as parameter.
  :
  : @param $value The string to be hashed.
  : @param $alg The algorithm to use for this hashing operation. Currently only
- :        "md5" and "sha1" algorithms are available.
- : @return The hash of the provided string. If <code>$alg</code> is not a valid
- :         algorithm name, the MD5 hash will be returned.
+ :        "md5" and "sha1" algorithms are available. If no valid algorithm
+ :        name is given, md5 will be used.
+ : @return The hash of the provided string. In case SHA1 is used, the resulting
+ :         hash value is base64 encoded.
  :)
-declare %private function hash:hash-impl($value as xs:string, $alg as xs:string) as xs:string external;
+declare function hash:hash-impl($value as xs:string, $alg as xs:string) as xs:string external;
