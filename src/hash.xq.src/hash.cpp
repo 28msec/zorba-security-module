@@ -97,8 +97,6 @@ public:
       std::stringstream lTmp;
       lTmp.write(lRes, 20);
 
-      std::cout << "blub: " << lTmp.str() << std::endl;
-
       lHash = zorba::encoding::Base64::encode(lTmp);
     } else {
       lHash = md5(lText.str());
