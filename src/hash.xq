@@ -21,7 +21,7 @@ xquery version "1.0";
  : For example, they compute MD5 and various SHA functions on either
  : strings or binary. The result is the base64 encoded value of the hash.
  :
- : @author Gabriel Petrovay, Markus Pilman
+ : @author Gabriel Petrovay, Markus Pilman, Matthias Brantner
  : @project cryptography
  :)
 module namespace hash = "http://www.zorba-xquery.com/modules/cryptography/hash";

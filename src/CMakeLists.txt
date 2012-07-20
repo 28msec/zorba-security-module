@@ -14,7 +14,7 @@
 
 DECLARE_ZORBA_MODULE (
   URI "http://www.zorba-xquery.com/modules/cryptography/hmac"
-  VERSION 1.0
+  VERSION 2.0
   FILE "hmac.xq"
   LINK_LIBRARIES ${OPENSSL_LIBRARIES}
 )

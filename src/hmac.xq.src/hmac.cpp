@@ -17,29 +17,39 @@
 #include "hmac.h"
 
 #include <sstream>
-
 #include <zorba/base64.h>
+#include <zorba/base64_stream.h>
 #include <zorba/diagnostic_list.h>
 #include <zorba/item_factory.h>
 #include <zorba/singleton_item_sequence.h>
 #include <zorba/user_exception.h>
 
-#include "hmac_sha1.h"
+#include <openssl/hmac.h>
 
 namespace zorba { namespace security {
 
-  ItemFactory* HMACModule::theFactory = 0;
+ItemFactory* HMACModule::theFactory = 0;
 
-  zorba::String getOneStringArgument(const ExternalFunction::Arguments_t& aArgs, int aIndex)
-  {
-    zorba::Item lItem;
-    Iterator_t args_iter = aArgs[aIndex]->getIterator();
-    args_iter->open();
-    args_iter->next(lItem); // must have one because the signature is defined like this
-    zorba::String lTmpString = lItem.getStringValue();
-    args_iter->close();
-    return lTmpString;
-  }
+zorba::Item
+getOneItemArgument(
+  const ExternalFunction::Arguments_t& aArgs,
+  int aIndex)
+{
+  zorba::Item lItem;
+  Iterator_t args_iter = aArgs[aIndex]->getIterator();
+  args_iter->open();
+  args_iter->next(lItem);
+  return lItem;
+}
+
+zorba::String
+getOneStringArgument(
+  const ExternalFunction::Arguments_t& aArgs,
+  int aIndex)
+{
+  zorba::Item lItem = getOneItemArgument(aArgs, aIndex);
+  return lItem.getStringValue();
+}
 
 
 HMACModule::~HMACModule()
@@ -55,9 +65,14 @@ ExternalFunction*
 HMACModule::getExternalFunction(const String& aLocalname)
 {
   ExternalFunction*& lFunc = theFunctions[aLocalname];
-  if (!lFunc) {
-    if (!aLocalname.compare("sha1")) {
-      lFunc = new HMACSHA1Function(this);
+  if (!lFunc)
+  {
+    if (!aLocalname.compare("compute"))
+    {
+      lFunc = new HMACComputeFunction(this);
+    }
+    else if (!aLocalname.compare("compute-binary")) {
+      lFunc = new HMACComputeBinaryFunction(this);
     }
   }
   return lFunc;
@@ -72,43 +87,150 @@ HMACModule::destroy()
   delete this;
 }
 
-std::string
-hmacSHA1(const std::string& aData, const std::string& aKey)
-{ 
-  unsigned char digest[20] ; 
-
-  char *message = new char[aData.length() + 1] ; 
-  memset(message, aData.length() + 1, 0);
-  strcpy(message, aData.c_str());
-  
-  char *key = new char[aKey.length() + 1];
-  memset(key, aKey.length() + 1, 0);
-  strcpy(key, aKey.c_str());
-    
-  zorba::securitymodule::CHMAC_SHA1 HMAC_SHA1 ;
-  HMAC_SHA1.HMAC_SHA1((unsigned char*) message, strlen(message), (unsigned char*)key, strlen(key), digest) ;
-  
-  zorba::String lDigest(std::string((char const*) digest, 20));
-  zorba::String lSignature = zorba::encoding::Base64::encode(lDigest);
-  return lSignature.c_str(); // uri-encoding is done automatically within zorba rest call
-}
-
 String
-HMACSHA1Function::getURI() const
+HMACComputeFunction::getURI() const
 {
   return theModule->getURI();
 }
 
-zorba::ItemSequence_t
-HMACSHA1Function::evaluate(const Arguments_t& aArgs) const
+String
+HMACComputeBinaryFunction::getURI() const
 {
-    zorba::Item lItem;
-
-    std::string lBaseString = (getOneStringArgument(aArgs, 0)).c_str();
-    std::string lKey = (getOneStringArgument(aArgs, 1)).c_str();
-    lItem = theModule->getItemFactory()->createString(hmacSHA1(lBaseString, lKey));
-    return zorba::ItemSequence_t(new zorba::SingletonItemSequence(lItem));
+  return theModule->getURI();
 }
+
+static void
+initContext(HMAC_CTX* aCtx, const String& aKey, const String& aAlg)
+{
+  if (aAlg == "sha1" || aAlg == "SHA1")
+  {
+    HMAC_Init(aCtx, aKey.c_str(), aKey.length(), EVP_sha1());
+  }
+  else if (aAlg == "sha256" || aAlg == "SHA256")
+  {
+    HMAC_Init(aCtx, aKey.c_str(), aKey.length(), EVP_sha256());
+  }
+  else if (aAlg == "md5" || aAlg == "MD5")
+  {
+    HMAC_Init(aCtx, aKey.c_str(), aKey.length(), EVP_md5());
+  } 
+  else
+  {
+    std::ostringstream lMsg;
+    lMsg << aAlg << ": unsupported hash algorithm";
+    throw USER_EXCEPTION(
+        HMACModule::getItemFactory()->createQName(
+        "http://www.zorba-xquery.com/modules/cryptography/hmac", "unsupported-algorithm"),
+        lMsg.str());
+  }
+}
+
+zorba::ItemSequence_t
+HMACComputeFunction::evaluate(const Arguments_t& aArgs) const
+{
+  zorba::Item lItem = getOneItemArgument(aArgs, 0);
+
+  String lKey = getOneStringArgument(aArgs, 1);
+  String lAlg = getOneStringArgument(aArgs, 2);
+
+  HMAC_CTX      ctx;
+  unsigned int  len;
+  unsigned char out[32]; // reserve max digest length for sha256
+
+  initContext(&ctx, lKey, lAlg);
+   
+  if (lItem.isStreamable())
+  {
+    std::istream& lStream = lItem.getStream();
+    char lBuf[1024];
+    while (lStream.good())
+    {
+      lStream.read(lBuf, 1024);
+      HMAC_Update(
+          &ctx,
+          reinterpret_cast<const unsigned char*>(&lBuf[0]),
+          lStream.gcount()
+        );
+    }
+  }
+  else
+  {
+    String lString = lItem.getStringValue();
+    HMAC_Update(
+        &ctx,
+        reinterpret_cast<const unsigned char*>(lString.c_str()),
+        lString.length());
+  }
+  HMAC_Final(&ctx, out, &len);
+  HMAC_cleanup(&ctx);
+
+  return zorba::ItemSequence_t(new zorba::SingletonItemSequence(
+        theModule->getItemFactory()->createBase64Binary(&out[0], len)));
+}
+
+zorba::ItemSequence_t
+HMACComputeBinaryFunction::evaluate(const Arguments_t& aArgs) const
+{
+  zorba::Item lItem = getOneItemArgument(aArgs, 0);
+
+  String lKey = getOneStringArgument(aArgs, 1);
+  String lAlg = getOneStringArgument(aArgs, 2);
+
+  HMAC_CTX      ctx;
+  unsigned int  len;
+  unsigned char out[32]; // reserve max digest length for sha256
+
+  initContext(&ctx, lKey, lAlg);
+
+  if (lItem.isStreamable())
+  {
+    std::istream& lStream = lItem.getStream();
+    bool lDecoderAttached = false;
+
+    if (lItem.isEncoded())
+    {
+      base64::attach(lStream);
+      lDecoderAttached = true;
+    }
+    char lBuf[1024];
+    while (lStream.good())
+    {
+      lStream.read(lBuf, 1024);
+      HMAC_Update(
+          &ctx,
+          reinterpret_cast<const unsigned char*>(&lBuf[0]),
+          lStream.gcount());
+    }
+    if (lDecoderAttached)
+    {
+      base64::detach(lStream);
+    }
+  }
+  else
+  {
+    String lTmpDecodedBuf;
+    size_t lSize;
+    const char* lMsg = lItem.getBase64BinaryValue(lSize);
+    if (lItem.isEncoded())
+    {
+      String lTmpEncoded(lMsg, lSize);
+      // lTmpDecodedBuf is used to make sure lMsg is still alive during HMAC_Update
+      lTmpDecodedBuf = encoding::Base64::decode(lTmpEncoded);
+      lMsg = lTmpDecodedBuf.c_str();
+      lSize = lTmpDecodedBuf.size();
+    }
+    HMAC_Update(
+        &ctx,
+        reinterpret_cast<const unsigned char*>(lMsg),
+        lSize);
+  }
+  HMAC_Final(&ctx, out, &len);
+  HMAC_cleanup(&ctx);
+
+  return zorba::ItemSequence_t(new zorba::SingletonItemSequence(
+        theModule->getItemFactory()->createBase64Binary(&out[0], len)));
+}
+
 } /* namespace security */ } /* namespace zorba */
 
 #ifdef WIN32

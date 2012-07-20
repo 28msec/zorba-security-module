@@ -22,6 +22,7 @@
 #include <zorba/zorba.h>
 #include <zorba/external_module.h>
 #include <zorba/function.h>
+#include <zorba/base64_stream.h>
 
 namespace zorba { namespace security {
 	
@@ -88,31 +89,44 @@ namespace zorba { namespace security {
       {
         std::istream& lStream = aMessage.getStream();
 
+        bool lDecoderAttached = false;
+
+        if (aDecode)
+        {
+          base64::attach(lStream);
+          lDecoderAttached = true;
+        }
+
         (*init)(&lCtx);
 
         char lBuf2[1024];
         while (lStream.good())
         {
           lStream.read(lBuf2, 1024);
-          if (aDecode)
-          {
-            // TODO
-            return 0;
-          }
           (*update)(&lCtx, &lBuf2[0], lStream.gcount());
         }
+
+        if (lDecoderAttached)
+        {
+          base64::detach(lStream);
+        }
+
         (*final)(&lBuf[0], &lCtx);
       }
       else
       {
         if (aMessage.getTypeCode() == store::XS_BASE64BINARY)
         {
+          String lTmpDecodedBuf;
           size_t lLen;
           const char* lTmp = aMessage.getBase64BinaryValue(lLen);
           if (aDecode)
           {
-            // TODO
-            return 0;
+            String lTmpEncoded(lTmp, lLen);
+            // lTmpDecodedBuf is used to make sure lMsg is still alive during HMAC_Update
+            lTmpDecodedBuf = encoding::Base64::decode(lTmpEncoded);
+            lTmp = lTmpDecodedBuf.c_str();
+            lLen = lTmpDecodedBuf.size();
           }
           (*hash)(
               reinterpret_cast<const unsigned char*>(lTmp),
