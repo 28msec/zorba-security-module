@@ -20,7 +20,7 @@ DECLARE_ZORBA_MODULE (
 )
 DECLARE_ZORBA_MODULE (
   URI "http://www.zorba-xquery.com/modules/cryptography/hash"
-  VERSION 1.0
+  VERSION 2.0
   FILE "hash.xq"
   LINK_LIBRARIES ${OPENSSL_LIBRARIES}
 )
