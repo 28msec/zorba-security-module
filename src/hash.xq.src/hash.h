@@ -22,6 +22,7 @@
 #include <zorba/zorba.h>
 #include <zorba/external_module.h>
 #include <zorba/function.h>
+#include <zorba/base64_stream.h>
 
 namespace zorba { namespace security {
 	
@@ -33,7 +34,7 @@ namespace zorba { namespace security {
     protected:
 		class ltstr
 		{
-        public:
+    public:
 			bool
 			operator()(const String& s1, const String& s2) const
 			{
@@ -55,6 +56,12 @@ namespace zorba { namespace security {
 		
 		virtual void
 		destroy();
+
+    static String
+    getStringArgument(const ExternalFunction::Arguments_t& aArgs, int aIndex);
+
+    static Item
+    getItemArgument(const ExternalFunction::Arguments_t& aArgs, int aIndex);
 		
 		static ItemFactory*
 		getItemFactory()
@@ -63,36 +70,135 @@ namespace zorba { namespace security {
 				theFactory = Zorba::getInstance(0)->getItemFactory();
 			return theFactory;
 		}
-		
-	};
-	
-	class HashSHA1Function : public NonContextualExternalFunction
-	{
-    protected:
-		const HashModule* theModule;
-		
-		static void
-		throwError(
-				   const std::string aErrorMessage,
-				   const Error& aErrorType);
-		
-    private:
-		
-    public:
-		HashSHA1Function(const HashModule* aModule): theModule(aModule){}
-		~HashSHA1Function(){}
-		
-		virtual String
-		getLocalName() const { return "sha1"; }
-		
-		virtual zorba::ItemSequence_t
-		evaluate(const Arguments_t&) const;
-		
-		virtual String
-		getURI() const;
-		
+
+    zorba::ItemSequence_t
+    hash(const ExternalFunction::Arguments_t& aArgs) const;
+
+    template <class CONTEXT, int DIGEST_LENGTH> zorba::ItemSequence_t
+    hash(
+        int(*init)(CONTEXT*),
+        int(*update)(CONTEXT*, const void*, size_t),
+        int(*final)(unsigned char*, CONTEXT*),
+        unsigned char*(hash)(const unsigned char*, size_t, unsigned char*),
+        zorba::Item& aMessage,
+        bool aDecode = false
+      ) const
+    {
+      unsigned char lBuf[DIGEST_LENGTH];
+
+      CONTEXT lCtx;
+
+      if (aMessage.isStreamable())
+      {
+        std::istream& lStream = aMessage.getStream();
+
+        bool lDecoderAttached = false;
+
+        if (aDecode)
+        {
+          base64::attach(lStream);
+          lDecoderAttached = true;
+        }
+
+        (*init)(&lCtx);
+
+        char lBuf2[1024];
+        while (lStream.good())
+        {
+          lStream.read(lBuf2, 1024);
+          (*update)(&lCtx, &lBuf2[0], lStream.gcount());
+        }
+
+        if (lDecoderAttached)
+        {
+          base64::detach(lStream);
+        }
+
+        (*final)(&lBuf[0], &lCtx);
+      }
+      else
+      {
+        if (aMessage.getTypeCode() == store::XS_BASE64BINARY)
+        {
+          String lTmpDecodedBuf;
+          size_t lLen;
+          const char* lTmp = aMessage.getBase64BinaryValue(lLen);
+          if (aDecode)
+          {
+            String lTmpEncoded(lTmp, lLen);
+            // lTmpDecodedBuf is used to make sure lMsg is still alive during HMAC_Update
+            lTmpDecodedBuf = encoding::Base64::decode(lTmpEncoded);
+            lTmp = lTmpDecodedBuf.c_str();
+            lLen = lTmpDecodedBuf.size();
+          }
+          (*hash)(
+              reinterpret_cast<const unsigned char*>(lTmp),
+              lLen,
+              &lBuf[0]
+            );
+        }
+        else
+        {
+          String lTmp = aMessage.getStringValue();
+          (*hash)(
+              reinterpret_cast<const unsigned char*>(lTmp.data()),
+              lTmp.size(),
+              &lBuf[0]
+            );
+        }
+      }
+      return
+        zorba::ItemSequence_t(new zorba::SingletonItemSequence(
+              getItemFactory()->createBase64Binary(&lBuf[0], DIGEST_LENGTH)));
+    }
 	};
 
+  class HashFunction : public NonContextualExternalFunction
+  {
+  protected:
+    const HashModule* theModule;
+  
+  public:
+    HashFunction(const HashModule* aModule): theModule(aModule){}
+    ~HashFunction(){}
+  
+    virtual String
+    getLocalName() const { return "hash"; }
+  
+    virtual zorba::ItemSequence_t
+    evaluate(const Arguments_t& aArgs) const;
+
+    virtual String
+    getURI() const
+    {
+      return theModule->getURI();
+    }
+  
+  };
+
+  class HashBinaryFunction : public NonContextualExternalFunction
+  {
+  protected:
+    const HashModule* theModule;
+  
+  public:
+    HashBinaryFunction(const HashModule* aModule): theModule(aModule){}
+    ~HashBinaryFunction(){}
+  
+    virtual String
+    getLocalName() const { return "hash-binary"; }
+  
+    virtual zorba::ItemSequence_t
+    evaluate(const Arguments_t& aArgs) const;
+
+    virtual String
+    getURI() const
+    {
+      return theModule->getURI();
+    }
+  
+  };
+	
 } /* namespace security */ 
 } /* namespace zorba */
 

@@ -23,27 +23,44 @@
 #include <zorba/user_exception.h>
 #include <zorba/item_factory.h>
 #include <zorba/singleton_item_sequence.h>
+#include <zorba/empty_sequence.h>
 #include <zorba/xquery_exception.h>
 #include <zorba/zorba.h>
 #include "hash.h"
 
-#include "md5_impl.h"
-#include "sha1.h"
+#include "openssl/md5.h"
+#include "openssl/sha.h"
+
 
 namespace zorba { namespace security {
 
-zorba::String getOneStringArgument(
-    const HashModule* aModule,
+/******************************************************************************
+ ******************************************************************************/
+zorba::String
+HashModule::getStringArgument(
     const ExternalFunction::Arguments_t& aArgs,
     int aIndex)
 {
   zorba::Item lItem;
   Iterator_t args_iter = aArgs[aIndex]->getIterator();
   args_iter->open();
-  args_iter->next(lItem); // must have one because the signature is defined like this
+  args_iter->next(lItem);
   zorba::String lTmpString = lItem.getStringValue();
   args_iter->close();
   return lTmpString;
+}
+
+zorba::Item
+HashModule::getItemArgument(
+    const ExternalFunction::Arguments_t& aArgs,
+    int aIndex)
+{
+  zorba::Item lItem;
+  Iterator_t args_iter = aArgs[aIndex]->getIterator();
+  args_iter->open();
+  args_iter->next(lItem);
+  args_iter->close();
+  return lItem;
 }
 
 HashModule::~HashModule()
@@ -65,69 +82,76 @@ HashModule::destroy()
   delete this;
 }
 
-class HashFunction : public NonContextualExternalFunction
-{
-protected:
-  const HashModule* theModule;
-
-public:
-  HashFunction(const HashModule* aModule): theModule(aModule){}
-  ~HashFunction(){}
-
-  virtual String
-  getLocalName() const { return "hash-impl"; }
-
-  virtual zorba::ItemSequence_t
-  evaluate(const Arguments_t& aArgs) const
-  {
-    zorba::String lText = getOneStringArgument(theModule, aArgs, 0);
-    zorba::String lAlg = getOneStringArgument(theModule, aArgs, 1);
-    zorba::String lHash;
-    if (lAlg == "sha1") {
-      CSHA1 lSha1;
-      const unsigned char* lData = (const unsigned char*) lText.c_str();
-      lSha1.Update(lData, lText.size());
-      lSha1.Final();
-      char lRes[65];
-      lSha1.GetHash((UINT_8 *)lRes);
-
-      // SHA1 is always 20bytes long
-      // avoid using a stream here because it might contain 0's
-      // (i.e. be null terminated)
-      std::stringstream lTmp;
-      lTmp.write(lRes, 20);
-
-      lHash = zorba::encoding::Base64::encode(lTmp);
-    } else {
-      lHash = md5(lText.str());
-    }
-    // implement here
-    zorba::Item lItem;
-    lItem = theModule->getItemFactory()->createString(lHash);
-    return zorba::ItemSequence_t(new zorba::SingletonItemSequence(lItem));
-  }
-
-  virtual String
-  getURI() const
-  {
-    return theModule->getURI();
-  }
-
-};
-
-ExternalFunction* HashModule::getExternalFunction(const 
+ExternalFunction*
+HashModule::getExternalFunction(const 
     String& aLocalname)
 {
   ExternalFunction*& lFunc = theFunctions[aLocalname];
   if (!lFunc) {
-    if (!aLocalname.compare("hash-impl")) {
+    if (!aLocalname.compare("hash")) {
       lFunc = new HashFunction(this);
+    } else if (!aLocalname.compare("hash-binary")) {
+      lFunc = new HashBinaryFunction(this);
     }
   }
   return lFunc;
 }
 
 ItemFactory* HashModule::theFactory = 0;
+
+/******************************************************************************
+ ******************************************************************************/
+zorba::ItemSequence_t
+HashModule::hash(const ExternalFunction::Arguments_t& aArgs) const
+{
+  zorba::Item lMessage = getItemArgument(aArgs, 0);
+  zorba::String lAlg = getStringArgument(aArgs, 1);
+
+  bool lDecode = lMessage.getTypeCode() == store::XS_BASE64BINARY &&
+    lMessage.isEncoded();
+
+  if (lAlg == "sha1" || lAlg == "SHA1")
+  {
+    return hash<SHA_CTX, SHA_DIGEST_LENGTH>
+      (&SHA1_Init, &SHA1_Update, &SHA1_Final, &SHA1, lMessage, lDecode);
+  }
+  else if (lAlg == "sha256" || lAlg == "SHA256")
+  {
+    return hash<SHA256_CTX, SHA256_DIGEST_LENGTH>
+      (&SHA256_Init, &SHA256_Update, &SHA256_Final, &SHA256, lMessage, lDecode);
+  }
+  else if (lAlg == "md5" || lAlg == "MD5")
+  {
+    return hash<MD5_CTX, MD5_DIGEST_LENGTH>
+      (&MD5_Init, &MD5_Update, &MD5_Final, &MD5, lMessage, lDecode);
+  } 
+  else
+  {
+    std::ostringstream lMsg;
+    lMsg << lAlg << ": unsupported hash algorithm";
+    throw USER_EXCEPTION(
+        getItemFactory()->createQName(
+          getURI(), "unsupported-algorithm"),
+        lMsg.str());
+  }
+  return zorba::ItemSequence_t(new EmptySequence());
+}
+
+/******************************************************************************
+ ******************************************************************************/
+zorba::ItemSequence_t
+HashFunction::evaluate(const Arguments_t& aArgs) const
+{
+  return theModule->hash(aArgs);
+}
+
+/******************************************************************************
+ ******************************************************************************/
+zorba::ItemSequence_t
+HashBinaryFunction::evaluate(const Arguments_t& aArgs) const
+{
+  return theModule->hash(aArgs);
+}
 
 } /* namespace security */
 } /* namespace zorba */

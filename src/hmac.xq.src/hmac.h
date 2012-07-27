@@ -60,32 +60,52 @@ namespace zorba { namespace security {
       static ItemFactory*
       getItemFactory()
       {
-        if(!theFactory)
+        if (!theFactory)
           theFactory = Zorba::getInstance(0)->getItemFactory();
         return theFactory;
       }
 
   };
 
-  class HMACSHA1Function : public NonContextualExternalFunction
+  class HMACComputeFunction : public NonContextualExternalFunction
   {
     protected:
       const HMACModule* theModule;
-    private:
 
     public:
-      HMACSHA1Function(const HMACModule* aModule): theModule(aModule){}
-      ~HMACSHA1Function(){}
+      HMACComputeFunction(const HMACModule* aModule)
+        : theModule(aModule) {}
+      ~HMACComputeFunction() {}
 
       virtual String
-      getLocalName() const { return "sha1"; }
+      getLocalName() const { return "compute"; }
 
       virtual zorba::ItemSequence_t
       evaluate(const Arguments_t&) const;
 
       virtual String
       getURI() const;
+  };
 
+  class HMACComputeBinaryFunction : public NonContextualExternalFunction
+  {
+    protected:
+      const HMACModule* theModule;
+
+    public:
+      HMACComputeBinaryFunction(const HMACModule* aModule)
+        : theModule(aModule) {}
+
+      ~HMACComputeBinaryFunction() {}
+
+      virtual String
+      getLocalName() const { return "compute-binary"; }
+
+      virtual zorba::ItemSequence_t
+      evaluate(const Arguments_t&) const;
+
+      virtual String
+      getURI() const;
   };
 } /* namespace security */ } /* namespace zorba */
 

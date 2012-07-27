@@ -1,7 +1,7 @@
 xquery version "1.0";
 
 (:
- : Copyright 2006-2009 The FLWOR Foundation.
+ : Copyright 2006-2012 The FLWOR Foundation.
  :
  : Licensed under the Apache License, Version 2.0 (the "License");
  : you may not use this file except in compliance with the License.
@@ -18,35 +18,69 @@ xquery version "1.0";
 
 (:~
  : This module provides functions that perform different hash operations.
+ : For example, they compute MD5 and various SHA functions on either
+ : strings or binary. The result is the base64 encoded value of the hash.
  :
- : @author Gabriel Petrovay, Markus Pilman
+ : @author Gabriel Petrovay, Markus Pilman, Matthias Brantner
  : @project cryptography
  :)
 module namespace hash = "http://www.zorba-xquery.com/modules/cryptography/hash";
 
 declare namespace ver = "http://www.zorba-xquery.com/options/versioning";
-declare option ver:module-version "1.0";
+declare option ver:module-version "2.0";
 
 (:~
  : Computes the MD5 hash of the string provided as parameter.
  :
- : @param $value The string to hash.
- : @return The MD5 hash of the provided string.
+ : @param $value The string to hash
+ :
+ : @return The MD5 hash as xs:base64Binary
  :)
-declare function hash:md5($value as xs:string) as xs:string
+declare function hash:md5($value as xs:string)
+  as xs:base64Binary
 {
-  hash:hash-impl($value, "md5")
+  hash:hash($value, "md5")
 };
 
 (:~
  : Computes the SHA1 hash of the string provided as parameter.
  :
  : @param $value The string to hash.
- : @return The base64 encoded SHA1 hash of the provided string.
+ :
+ : @return The SHA1 hash as xs:base64Binary
  :)
-declare function hash:sha1($value as xs:string) as xs:string
+declare function hash:sha1($value as xs:string)
+  as xs:base64Binary
 {
-  hash:hash-impl($value, "sha1")
+  hash:hash($value, "sha1")
+};
+
+(:~
+ : This function computes the MD5 hash value of the binary form of the given
+ : base64Binary item, i.e. the item is base64-decoded before hashing.
+ :
+ : @param $value The binary item to hash.
+ :
+ : @return The MD5 hash of the provided binary.
+ :)
+declare function hash:md5-binary($value as xs:base64Binary)
+  as xs:base64Binary
+{
+  hash:hash-binary($value, "md5")
+};
+
+(:~
+ : This function computes the SHA1 hash value of the binary form of the given
+ : base64Binary item, i.e. the item is base64-decoded before hashing.
+ :
+ : @param $value The binary item to hash.
+ :
+ : @return The base64 encoded SHA1 hash of the provided binary.
+ :)
+declare function hash:sha1-binary($value as xs:base64Binary)
+  as xs:base64Binary
+{
+  hash:hash-binary($value, "sha1")
 };
 
 (:~
@@ -54,10 +88,31 @@ declare function hash:sha1($value as xs:string) as xs:string
  : The function expects the hash algorithm to be used as parameter.
  :
  : @param $value The string to be hashed.
- : @param $alg The algorithm to use for this hashing operation. Currently only
- :        "md5" and "sha1" algorithms are available. If no valid algorithm
- :        name is given, md5 will be used.
- : @return The hash of the provided string. In case SHA1 is used, the resulting
- :         hash value is base64 encoded.
+ :
+ : @param $alg The algorithm to use for this hashing operation. Supported
+ :        algorithms are "md5", "sha1", and "sha256".
+ :
+ : @return The hash as xs:base64binary of the provided string
+ :
+ : @error hash:unsupported-algorithm if the given hash algorithm is not
+ :  supported
  :)
-declare function hash:hash-impl($value as xs:string, $alg as xs:string) as xs:string external;
+declare function hash:hash($value as xs:string, $alg as xs:string)
+  as xs:base64Binary external;
+
+(:~
+ : This function computes a hash value of the binary form of the given
+ : base64Binary item, i.e. the item is base64-decoded before hashing.
+ :
+ : @param $value The binary item to be hashed.
+ :
+ : @param $alg The algorithm to use for this hashing operation. Supported
+ :        algorithms are "md5", "sha1", and "sha256".
+ :
+ : @return The hash as xs:base64Binary of the provided binary
+ :
+ : @error hash:unsupported-algorithm if the given hash algorithm is not
+ :  supported
+ :)
+declare function hash:hash-binary($value as xs:base64Binary, $alg as xs:string)
+  as xs:base64Binary external;
