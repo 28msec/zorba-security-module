@@ -71,6 +71,9 @@ namespace zorba { namespace security {
 			return theFactory;
 		}
 
+    zorba::ItemSequence_t
+    hash(const ExternalFunction::Arguments_t& aArgs) const;
+
     template <class CONTEXT, int DIGEST_LENGTH> zorba::ItemSequence_t
     hash(
         int(*init)(CONTEXT*),

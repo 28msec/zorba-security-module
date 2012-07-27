@@ -17,10 +17,12 @@ xquery version "1.0";
 :)
 
 (:~
- : This module provides functions that perform hmac operations.
+ : This module provides functions that perform HMAC
+ : (hash-based message authentication code) operations.
  : For example, they calculate message codes involving hash functions such
- : as MD5 and various SHA variants.
- : The result is the base64 encoded value of the hash.
+ : as MD5 and various SHA variants. The result is the base64 encoded value
+ : of the hash. A hash may be used to verify the data integrity and
+ : the authenticity of a message.
  :
  : @author William Candillon, Matthias Brantner
  : @project cryptography

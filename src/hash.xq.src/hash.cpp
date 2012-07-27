@@ -99,66 +99,30 @@ HashModule::getExternalFunction(const
 
 ItemFactory* HashModule::theFactory = 0;
 
-
 /******************************************************************************
  ******************************************************************************/
 zorba::ItemSequence_t
-HashFunction::evaluate(const Arguments_t& aArgs) const
+HashModule::hash(const ExternalFunction::Arguments_t& aArgs) const
 {
-  zorba::Item lMessage = theModule->getItemArgument(aArgs, 0);
-  zorba::String lAlg = theModule->getStringArgument(aArgs, 1);
+  zorba::Item lMessage = getItemArgument(aArgs, 0);
+  zorba::String lAlg = getStringArgument(aArgs, 1);
+
+  bool lDecode = lMessage.getTypeCode() == store::XS_BASE64BINARY &&
+    lMessage.isEncoded();
 
   if (lAlg == "sha1" || lAlg == "SHA1")
   {
-    return theModule->hash<SHA_CTX, SHA_DIGEST_LENGTH>
-      (&SHA1_Init, &SHA1_Update, &SHA1_Final, &SHA1, lMessage);
-  }
-  else if (lAlg == "sha256" || lAlg == "SHA256")
-  {
-    return theModule->hash<SHA256_CTX, SHA256_DIGEST_LENGTH>
-      (&SHA256_Init, &SHA256_Update, &SHA256_Final, &SHA256, lMessage);
-  }
-  else if (lAlg == "md5" || lAlg == "MD5")
-  {
-    return theModule->hash<MD5_CTX, MD5_DIGEST_LENGTH>
-      (&MD5_Init, &MD5_Update, &MD5_Final, &MD5, lMessage);
-  } 
-  else
-  {
-    std::ostringstream lMsg;
-    lMsg << lAlg << ": unsupported hash algorithm";
-    throw USER_EXCEPTION(
-        theModule->getItemFactory()->createQName(
-          theModule->getURI(), "unsupported-algorithm"),
-          lMsg.str());
-  }
-  return zorba::ItemSequence_t(new EmptySequence());
-}
-
-
-/******************************************************************************
- ******************************************************************************/
-zorba::ItemSequence_t
-HashBinaryFunction::evaluate(const Arguments_t& aArgs) const
-{
-  zorba::Item lMessage = theModule->getItemArgument(aArgs, 0);
-  zorba::String lAlg = theModule->getStringArgument(aArgs, 1);
-
-  bool lDecode = lMessage.isEncoded();
-
-  if (lAlg == "sha1" || lAlg == "SHA1")
-  {
-    return theModule->hash<SHA_CTX, SHA_DIGEST_LENGTH>
+    return hash<SHA_CTX, SHA_DIGEST_LENGTH>
       (&SHA1_Init, &SHA1_Update, &SHA1_Final, &SHA1, lMessage, lDecode);
   }
   else if (lAlg == "sha256" || lAlg == "SHA256")
   {
-    return theModule->hash<SHA256_CTX, SHA256_DIGEST_LENGTH>
+    return hash<SHA256_CTX, SHA256_DIGEST_LENGTH>
       (&SHA256_Init, &SHA256_Update, &SHA256_Final, &SHA256, lMessage, lDecode);
   }
   else if (lAlg == "md5" || lAlg == "MD5")
   {
-    return theModule->hash<MD5_CTX, MD5_DIGEST_LENGTH>
+    return hash<MD5_CTX, MD5_DIGEST_LENGTH>
       (&MD5_Init, &MD5_Update, &MD5_Final, &MD5, lMessage, lDecode);
   } 
   else
@@ -166,12 +130,27 @@ HashBinaryFunction::evaluate(const Arguments_t& aArgs) const
     std::ostringstream lMsg;
     lMsg << lAlg << ": unsupported hash algorithm";
     throw USER_EXCEPTION(
-        theModule->getItemFactory()->createQName(
-          theModule->getURI(), "unsupported-algorithm"),
-          lMsg.str());
+        getItemFactory()->createQName(
+          getURI(), "unsupported-algorithm"),
+        lMsg.str());
   }
-  
   return zorba::ItemSequence_t(new EmptySequence());
+}
+
+/******************************************************************************
+ ******************************************************************************/
+zorba::ItemSequence_t
+HashFunction::evaluate(const Arguments_t& aArgs) const
+{
+  return theModule->hash(aArgs);
+}
+
+/******************************************************************************
+ ******************************************************************************/
+zorba::ItemSequence_t
+HashBinaryFunction::evaluate(const Arguments_t& aArgs) const
+{
+  return theModule->hash(aArgs);
 }
 
 } /* namespace security */
