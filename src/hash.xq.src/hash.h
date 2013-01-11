@@ -25,51 +25,51 @@
 #include <zorba/base64_stream.h>
 
 namespace zorba { namespace security {
-	
-	class HashModule : public ExternalModule
-	{
+
+class HashModule : public ExternalModule
+{
     private:
-		static ItemFactory* theFactory;
-		
+    static ItemFactory* theFactory;
+    
     protected:
-		class ltstr
-		{
+    class ltstr
+    {
     public:
-			bool
-			operator()(const String& s1, const String& s2) const
-			{
-				return s1.compare(s2) < 0;
-			}
-		};
-		
-		typedef std::map<String, ExternalFunction*, ltstr> FuncMap_t;
-		FuncMap_t theFunctions;
-		
+      bool
+      operator()(const String& s1, const String& s2) const
+      {
+        return s1.compare(s2) < 0;
+      }
+    };
+    
+    typedef std::map<String, ExternalFunction*, ltstr> FuncMap_t;
+    FuncMap_t theFunctions;
+    
     public:
-		virtual ~HashModule();
-		
-		virtual String
-		getURI() const { return "http://www.zorba-xquery.com/modules/cryptography/hash"; }
-		
-		virtual ExternalFunction*
-		getExternalFunction(const String& aLocalname);
-		
-		virtual void
-		destroy();
+    virtual ~HashModule();
+    
+    virtual String
+    getURI() const { return "http://www.zorba-xquery.com/modules/cryptography/hash"; }
+    
+    virtual ExternalFunction*
+    getExternalFunction(const String& aLocalname);
+    
+    virtual void
+    destroy();
 
     static String
     getStringArgument(const ExternalFunction::Arguments_t& aArgs, int aIndex);
 
     static Item
     getItemArgument(const ExternalFunction::Arguments_t& aArgs, int aIndex);
-		
-		static ItemFactory*
-		getItemFactory()
-		{
-			if(!theFactory)
-				theFactory = Zorba::getInstance(0)->getItemFactory();
-			return theFactory;
-		}
+    
+    static ItemFactory*
+    getItemFactory()
+    {
+      if(!theFactory)
+        theFactory = Zorba::getInstance(0)->getItemFactory();
+      return theFactory;
+    }
 
     zorba::ItemSequence_t
     hash(const ExternalFunction::Arguments_t& aArgs) const;
@@ -151,7 +151,7 @@ namespace zorba { namespace security {
         zorba::ItemSequence_t(new zorba::SingletonItemSequence(
               getItemFactory()->createBase64Binary(&lBuf[0], DIGEST_LENGTH)));
     }
-	};
+  };
 
   class HashFunction : public NonContextualExternalFunction
   {
@@ -198,7 +198,7 @@ namespace zorba { namespace security {
     }
   
   };
-	
+
 } /* namespace security */ 
 } /* namespace zorba */
 
