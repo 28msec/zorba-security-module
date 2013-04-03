@@ -26,6 +26,7 @@ IF (NOT OPENSSL_FOUND)
 
   MESSAGE(WARNING "Could not find the OpenSSL library and development headers")
   MESSAGE(WARNING "Not building security modules")
+  SET_PROPERTY (GLOBAL PROPERTY ZORBA_PROJECT_UNAVAILABLE 1)
 
 ELSE (NOT OPENSSL_FOUND)
 
