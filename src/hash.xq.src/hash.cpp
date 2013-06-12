@@ -15,9 +15,11 @@
  */
 
 #include <sstream>
-#include <map>
 
-#include <zorba/base64.h>
+#include <openssl/md5.h>
+#include <openssl/sha.h>
+
+#include <zorba/util/base64_util.h>
 #include <zorba/diagnostic_list.h>
 #include <zorba/external_module.h>
 #include <zorba/user_exception.h>
@@ -26,11 +28,8 @@
 #include <zorba/empty_sequence.h>
 #include <zorba/xquery_exception.h>
 #include <zorba/zorba.h>
+
 #include "hash.h"
-
-#include "openssl/md5.h"
-#include "openssl/sha.h"
-
 
 namespace zorba { namespace security {
 

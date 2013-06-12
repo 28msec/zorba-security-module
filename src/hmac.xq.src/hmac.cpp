@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-#include "hmac.h"
-
 #include <sstream>
-#include <zorba/base64.h>
-#include <zorba/base64_stream.h>
+#include <openssl/hmac.h>
+
 #include <zorba/diagnostic_list.h>
 #include <zorba/item_factory.h>
 #include <zorba/singleton_item_sequence.h>
 #include <zorba/user_exception.h>
+#include <zorba/util/base64_stream.h>
+#include <zorba/util/base64_util.h>
 
-#include <openssl/hmac.h>
+#include "hmac.h"
 
 namespace zorba { namespace security {
 
@@ -215,7 +215,7 @@ HMACComputeBinaryFunction::evaluate(const Arguments_t& aArgs) const
     {
       String lTmpEncoded(lMsg, lSize);
       // lTmpDecodedBuf is used to make sure lMsg is still alive during HMAC_Update
-      lTmpDecodedBuf = encoding::Base64::decode(lTmpEncoded);
+      lTmpDecodedBuf = base64::decode(lTmpEncoded);
       lMsg = lTmpDecodedBuf.c_str();
       lSize = lTmpDecodedBuf.size();
     }

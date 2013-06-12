@@ -22,7 +22,7 @@
 #include <zorba/zorba.h>
 #include <zorba/external_module.h>
 #include <zorba/function.h>
-#include <zorba/base64_stream.h>
+#include <zorba/util/base64_stream.h>
 
 namespace zorba { namespace security {
 
@@ -127,7 +127,7 @@ class HashModule : public ExternalModule
           {
             String lTmpEncoded(lTmp, lLen);
             // lTmpDecodedBuf is used to make sure lMsg is still alive during HMAC_Update
-            lTmpDecodedBuf = encoding::Base64::decode(lTmpEncoded);
+            lTmpDecodedBuf = base64::decode(lTmpEncoded);
             lTmp = lTmpDecodedBuf.c_str();
             lLen = lTmpDecodedBuf.size();
           }
