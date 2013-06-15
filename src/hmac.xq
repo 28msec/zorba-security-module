@@ -25,7 +25,7 @@ xquery version "1.0";
  : the authenticity of a message.
  :
  : @author William Candillon, Matthias Brantner
- : @project cryptography
+ : @project Zorba/Cryptography/HMAC
  :
  :)
 module namespace hmac = "http://www.zorba-xquery.com/modules/cryptography/hmac";

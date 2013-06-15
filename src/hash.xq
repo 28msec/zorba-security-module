@@ -22,7 +22,7 @@ xquery version "1.0";
  : strings or binary. The result is the base64 encoded value of the hash.
  :
  : @author Gabriel Petrovay, Markus Pilman, Matthias Brantner
- : @project cryptography
+ : @project Zorba/Cryptography/hash
  :)
 module namespace hash = "http://www.zorba-xquery.com/modules/cryptography/hash";
 
