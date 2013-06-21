@@ -132,24 +132,28 @@ class HashModule : public ExternalModule
             lLen = lTmpDecodedBuf.size();
           }
           (*hash)(
-              reinterpret_cast<const unsigned char*>(lTmp),
-              lLen,
-              &lBuf[0]
-            );
+            reinterpret_cast<const unsigned char*>(lTmp),
+            lLen,
+            &lBuf[0]
+          );
         }
         else
         {
           String lTmp = aMessage.getStringValue();
           (*hash)(
-              reinterpret_cast<const unsigned char*>(lTmp.data()),
-              lTmp.size(),
-              &lBuf[0]
-            );
+            reinterpret_cast<const unsigned char*>(lTmp.data()),
+            lTmp.size(),
+            &lBuf[0]
+          );
         }
       }
-      return
-        zorba::ItemSequence_t(new zorba::SingletonItemSequence(
-              getItemFactory()->createBase64Binary(&lBuf[0], DIGEST_LENGTH)));
+      return zorba::ItemSequence_t(
+        new zorba::SingletonItemSequence(
+          getItemFactory()->createBase64Binary(
+            reinterpret_cast<char const*>(&lBuf[0]), DIGEST_LENGTH, true
+          )
+        )
+      );
     }
   };
 
@@ -203,3 +207,4 @@ class HashModule : public ExternalModule
 } /* namespace zorba */
 
 #endif
+/* vim:set et sw=2 ts=2: */

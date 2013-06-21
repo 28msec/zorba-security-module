@@ -164,8 +164,13 @@ HMACComputeFunction::evaluate(const Arguments_t& aArgs) const
   HMAC_Final(&ctx, out, &len);
   HMAC_cleanup(&ctx);
 
-  return zorba::ItemSequence_t(new zorba::SingletonItemSequence(
-        theModule->getItemFactory()->createBase64Binary(&out[0], len)));
+  return zorba::ItemSequence_t(
+    new zorba::SingletonItemSequence(
+      theModule->getItemFactory()->createBase64Binary(
+        reinterpret_cast<char const*>(&out[0]), len, false
+      )
+    )
+  );
 }
 
 zorba::ItemSequence_t
@@ -227,8 +232,13 @@ HMACComputeBinaryFunction::evaluate(const Arguments_t& aArgs) const
   HMAC_Final(&ctx, out, &len);
   HMAC_cleanup(&ctx);
 
-  return zorba::ItemSequence_t(new zorba::SingletonItemSequence(
-        theModule->getItemFactory()->createBase64Binary(&out[0], len)));
+  return zorba::ItemSequence_t(
+    new zorba::SingletonItemSequence(
+      theModule->getItemFactory()->createBase64Binary(
+        reinterpret_cast<char const*>(&out[0]), len, false
+      )
+    )
+  );
 }
 
 } /* namespace security */ } /* namespace zorba */
@@ -242,3 +252,5 @@ HMACComputeBinaryFunction::evaluate(const Arguments_t& aArgs) const
 extern "C" DLL_EXPORT zorba::ExternalModule* createModule() {
   return new zorba::security::HMACModule();
 }
+
+/* vim:set et sw=2 ts=2: */
