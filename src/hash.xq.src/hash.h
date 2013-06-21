@@ -150,7 +150,7 @@ class HashModule : public ExternalModule
       return zorba::ItemSequence_t(
         new zorba::SingletonItemSequence(
           getItemFactory()->createBase64Binary(
-            reinterpret_cast<char const*>(&lBuf[0]), DIGEST_LENGTH, true
+            reinterpret_cast<char const*>(&lBuf[0]), DIGEST_LENGTH, false
           )
         )
       );
