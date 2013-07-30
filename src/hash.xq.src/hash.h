@@ -127,7 +127,7 @@ class HashModule : public ExternalModule
           {
             String lTmpEncoded;
             // lTmpDecodedBuf is used to make sure lMsg is still alive during HMAC_Update
-            lTmpDecodedBuf = base64::decode(lTmp, lLen, &lTmpDecodedBuf);
+            base64::decode(lTmp, lLen, &lTmpDecodedBuf);
             lTmp = lTmpDecodedBuf.c_str();
             lLen = lTmpDecodedBuf.size();
           }
