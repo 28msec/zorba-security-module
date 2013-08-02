@@ -125,9 +125,9 @@ class HashModule : public ExternalModule
           const char* lTmp = aMessage.getBase64BinaryValue(lLen);
           if (aDecode)
           {
-            String lTmpEncoded(lTmp, lLen);
+            String lTmpEncoded;
             // lTmpDecodedBuf is used to make sure lMsg is still alive during HMAC_Update
-            lTmpDecodedBuf = base64::decode(lTmpEncoded);
+            base64::decode(lTmp, lLen, &lTmpDecodedBuf);
             lTmp = lTmpDecodedBuf.c_str();
             lLen = lTmpDecodedBuf.size();
           }
