@@ -49,7 +49,7 @@ namespace zorba { namespace security {
       virtual ~HMACModule();
   
       virtual String
-      getURI() const { return "http://www.zorba-xquery.com/modules/cryptography/hmac"; }
+      getURI() const { return "http://zorba.io/modules/hmac"; }
   
       virtual ExternalFunction*
       getExternalFunction(const String& aLocalname);

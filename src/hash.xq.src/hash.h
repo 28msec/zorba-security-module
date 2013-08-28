@@ -49,7 +49,7 @@ class HashModule : public ExternalModule
     virtual ~HashModule();
     
     virtual String
-    getURI() const { return "http://www.zorba-xquery.com/modules/cryptography/hash"; }
+    getURI() const { return "http://zorba.io/modules/hash"; }
     
     virtual ExternalFunction*
     getExternalFunction(const String& aLocalname);
@@ -120,16 +120,17 @@ class HashModule : public ExternalModule
       {
         if (aMessage.getTypeCode() == store::XS_BASE64BINARY)
         {
-          String lTmpDecodedBuf;
           size_t lLen;
           const char* lTmp = aMessage.getBase64BinaryValue(lLen);
+          char *lTmpDecodedBuf;
           if (aDecode)
           {
-            String lTmpEncoded;
             // lTmpDecodedBuf is used to make sure lMsg is still alive during HMAC_Update
-            base64::decode(lTmp, lLen, &lTmpDecodedBuf);
-            lTmp = lTmpDecodedBuf.c_str();
-            lLen = lTmpDecodedBuf.size();
+            lTmpDecodedBuf = (char *)malloc(lLen*sizeof(char)+1);
+            base64::decode(lTmp, lLen, lTmpDecodedBuf);
+            lTmp = lTmpDecodedBuf;
+            lLen = strlen(lTmpDecodedBuf);
+            free(lTmpDecodedBuf);
           }
           (*hash)(
             reinterpret_cast<const unsigned char*>(lTmp),

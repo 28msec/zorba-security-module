@@ -1,5 +1,5 @@
 import module namespace f = "http://expath.org/ns/file";
-import module namespace hash = "http://www.zorba-xquery.com/modules/cryptography/hash";
+import module namespace hash = "http://zorba.io/modules/hash";
 
 variable $f := f:read-binary(resolve-uri("ls"));
 

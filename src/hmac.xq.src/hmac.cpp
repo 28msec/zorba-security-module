@@ -120,7 +120,7 @@ initContext(HMAC_CTX* aCtx, const String& aKey, const String& aAlg)
     lMsg << aAlg << ": unsupported hash algorithm";
     throw USER_EXCEPTION(
         HMACModule::getItemFactory()->createQName(
-        "http://www.zorba-xquery.com/modules/cryptography/hmac", "unsupported-algorithm"),
+        "http://zorba.io/modules/hmac", "unsupported-algorithm"),
         lMsg.str());
   }
 }
@@ -213,16 +213,17 @@ HMACComputeBinaryFunction::evaluate(const Arguments_t& aArgs) const
   }
   else
   {
-    String lTmpDecodedBuf;
     size_t lSize;
     const char* lMsg = lItem.getBase64BinaryValue(lSize);
+    char *lTmpDecodedBuf;
     if (lItem.isEncoded())
     {
-      String lTmpEncoded;
       // lTmpDecodedBuf is used to make sure lMsg is still alive during HMAC_Update
-      base64::decode(lMsg, lSize, &lTmpDecodedBuf);
-      lMsg = lTmpDecodedBuf.c_str();
-      lSize = lTmpDecodedBuf.size();
+      lTmpDecodedBuf = (char *)malloc(lSize*sizeof(char)+1);
+      base64::decode(lMsg, lSize, lTmpDecodedBuf);
+      lMsg = lTmpDecodedBuf;
+      lSize = strlen(lTmpDecodedBuf);
+      free(lTmpDecodedBuf);
     }
     HMAC_Update(
         &ctx,

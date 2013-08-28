@@ -1,4 +1,4 @@
-import module namespace hash = "http://www.zorba-xquery.com/modules/cryptography/hmac";
+import module namespace hash = "http://zorba.io/modules/hmac";
 import module namespace f = "http://expath.org/ns/file";
 
 hash:compute-binary(xs:base64Binary("Zm9vCg=="), "bar", "sha256"),
