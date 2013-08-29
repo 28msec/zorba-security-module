@@ -120,7 +120,7 @@ initContext(HMAC_CTX* aCtx, const String& aKey, const String& aAlg)
     lMsg << aAlg << ": unsupported hash algorithm";
     throw USER_EXCEPTION(
         HMACModule::getItemFactory()->createQName(
-        "http://zorba.io/modules/hmac", "unsupported-algorithm"),
+        "http://zorba.io/modules/hmac", "UNSUPPORTED-ALGORITHM"),
         lMsg.str());
   }
 }

@@ -94,7 +94,7 @@ declare function hash:sha1-binary($value as xs:base64Binary)
  :
  : @return The hash as xs:base64binary of the provided string
  :
- : @error hash:unsupported-algorithm if the given hash algorithm is not
+ : @error hash:UNSUPPORTED-ALGORITHM if the given hash algorithm is not
  :  supported
  :)
 declare function hash:hash($value as xs:string, $alg as xs:string)
@@ -111,7 +111,7 @@ declare function hash:hash($value as xs:string, $alg as xs:string)
  :
  : @return The hash as xs:base64Binary of the provided binary
  :
- : @error hash:unsupported-algorithm if the given hash algorithm is not
+ : @error hash:UNSUPPORTED-ALGORITHM if the given hash algorithm is not
  :  supported
  :)
 declare function hash:hash-binary($value as xs:base64Binary, $alg as xs:string)

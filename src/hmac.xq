@@ -114,7 +114,7 @@ declare function hmac:sha1-binary(
  :
  : @return the base64 encoded message authentication code
  :
- : @error hash:unsupported-algorithm if the given hash algorithm is not
+ : @error hash:UNSUPPORTED-ALGORITHM if the given hash algorithm is not
  :  supported
  :)
 declare function hmac:compute(
@@ -135,7 +135,7 @@ declare function hmac:compute(
  :
  : @return the base64 encoded message authentication code
  :
- : @error hash:unsupported-algorithm if the given hash algorithm is not
+ : @error hash:UNSUPPORTED-ALGORITHM if the given hash algorithm is not
  :  supported
  :)
 declare function hmac:compute-binary(

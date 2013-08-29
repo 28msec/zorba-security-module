@@ -130,7 +130,7 @@ HashModule::hash(const ExternalFunction::Arguments_t& aArgs) const
     lMsg << lAlg << ": unsupported hash algorithm";
     throw USER_EXCEPTION(
         getItemFactory()->createQName(
-          getURI(), "unsupported-algorithm"),
+          getURI(), "UNSUPPORTED-ALGORITHM"),
         lMsg.str());
   }
   return zorba::ItemSequence_t(new EmptySequence());
