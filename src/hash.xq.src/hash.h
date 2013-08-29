@@ -120,17 +120,16 @@ class HashModule : public ExternalModule
       {
         if (aMessage.getTypeCode() == store::XS_BASE64BINARY)
         {
+          String lTmpDecodedBuf;
           size_t lLen;
           const char* lTmp = aMessage.getBase64BinaryValue(lLen);
-          char *lTmpDecodedBuf;
           if (aDecode)
           {
+            String lTmpEncoded;
             // lTmpDecodedBuf is used to make sure lMsg is still alive during HMAC_Update
-            lTmpDecodedBuf = (char *)malloc(lLen*sizeof(char)+1);
-            base64::decode(lTmp, lLen, lTmpDecodedBuf);
-            lTmp = lTmpDecodedBuf;
-            lLen = strlen(lTmpDecodedBuf);
-            free(lTmpDecodedBuf);
+            base64::decode(lTmp, lLen, &lTmpDecodedBuf);
+            lTmp = lTmpDecodedBuf.c_str();
+            lLen = lTmpDecodedBuf.size();
           }
           (*hash)(
             reinterpret_cast<const unsigned char*>(lTmp),

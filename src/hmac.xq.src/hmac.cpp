@@ -213,17 +213,16 @@ HMACComputeBinaryFunction::evaluate(const Arguments_t& aArgs) const
   }
   else
   {
+    String lTmpDecodedBuf;
     size_t lSize;
     const char* lMsg = lItem.getBase64BinaryValue(lSize);
-    char *lTmpDecodedBuf;
     if (lItem.isEncoded())
     {
+      String lTmpEncoded;
       // lTmpDecodedBuf is used to make sure lMsg is still alive during HMAC_Update
-      lTmpDecodedBuf = (char *)malloc(lSize*sizeof(char)+1);
-      base64::decode(lMsg, lSize, lTmpDecodedBuf);
-      lMsg = lTmpDecodedBuf;
-      lSize = strlen(lTmpDecodedBuf);
-      free(lTmpDecodedBuf);
+      base64::decode(lMsg, lSize, &lTmpDecodedBuf);
+      lMsg = lTmpDecodedBuf.c_str();
+      lSize = lTmpDecodedBuf.size();
     }
     HMAC_Update(
         &ctx,
