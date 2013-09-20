@@ -49,7 +49,7 @@ class HashModule : public ExternalModule
     virtual ~HashModule();
     
     virtual String
-    getURI() const { return "http://www.zorba-xquery.com/modules/cryptography/hash"; }
+    getURI() const { return "http://zorba.io/modules/hash"; }
     
     virtual ExternalFunction*
     getExternalFunction(const String& aLocalname);

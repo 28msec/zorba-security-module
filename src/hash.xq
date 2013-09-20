@@ -1,4 +1,4 @@
-xquery version "1.0";
+xquery version "3.0";
 
 (:
  : Copyright 2006-2012 The FLWOR Foundation.
@@ -24,10 +24,10 @@ xquery version "1.0";
  : @author Gabriel Petrovay, Markus Pilman, Matthias Brantner
  : @project Zorba/Cryptography/Hash
  :)
-module namespace hash = "http://www.zorba-xquery.com/modules/cryptography/hash";
+module namespace hash = "http://zorba.io/modules/hash";
 
 declare namespace ver = "http://zorba.io/options/versioning";
-declare option ver:module-version "2.0";
+declare option ver:module-version "1.0";
 
 (:~
  : Computes the MD5 hash of the string provided as parameter.
@@ -94,7 +94,7 @@ declare function hash:sha1-binary($value as xs:base64Binary)
  :
  : @return The hash as xs:base64binary of the provided string
  :
- : @error hash:unsupported-algorithm if the given hash algorithm is not
+ : @error hash:UNSUPPORTED-ALGORITHM if the given hash algorithm is not
  :  supported
  :)
 declare function hash:hash($value as xs:string, $alg as xs:string)
@@ -111,7 +111,7 @@ declare function hash:hash($value as xs:string, $alg as xs:string)
  :
  : @return The hash as xs:base64Binary of the provided binary
  :
- : @error hash:unsupported-algorithm if the given hash algorithm is not
+ : @error hash:UNSUPPORTED-ALGORITHM if the given hash algorithm is not
  :  supported
  :)
 declare function hash:hash-binary($value as xs:base64Binary, $alg as xs:string)

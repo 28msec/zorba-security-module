@@ -13,14 +13,14 @@
 # limitations under the License.
 
 DECLARE_ZORBA_MODULE (
-  URI "http://www.zorba-xquery.com/modules/cryptography/hmac"
-  VERSION 2.0
+  URI "http://zorba.io/modules/hmac"
+  VERSION 1.0
   FILE "hmac.xq"
   LINK_LIBRARIES ${OPENSSL_LIBRARIES}
 )
 DECLARE_ZORBA_MODULE (
-  URI "http://www.zorba-xquery.com/modules/cryptography/hash"
-  VERSION 2.0
+  URI "http://zorba.io/modules/hash"
+  VERSION 1.0
   FILE "hash.xq"
   LINK_LIBRARIES ${OPENSSL_LIBRARIES}
 )

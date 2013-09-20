@@ -1,4 +1,4 @@
-xquery version "1.0";
+xquery version "3.0";
 
 (:
  : Copyright 2006-2012 The FLWOR Foundation.
@@ -28,10 +28,10 @@ xquery version "1.0";
  : @project Zorba/Cryptography/HMAC
  :
  :)
-module namespace hmac = "http://www.zorba-xquery.com/modules/cryptography/hmac";
+module namespace hmac = "http://zorba.io/modules/hmac";
 
 declare namespace ver = "http://zorba.io/options/versioning";
-declare option ver:module-version "2.0";
+declare option ver:module-version "1.0";
 
 (:~
  : Calculate the HMAC for the given message and secret-key involving
@@ -114,7 +114,7 @@ declare function hmac:sha1-binary(
  :
  : @return the base64 encoded message authentication code
  :
- : @error hash:unsupported-algorithm if the given hash algorithm is not
+ : @error hash:UNSUPPORTED-ALGORITHM if the given hash algorithm is not
  :  supported
  :)
 declare function hmac:compute(
@@ -135,7 +135,7 @@ declare function hmac:compute(
  :
  : @return the base64 encoded message authentication code
  :
- : @error hash:unsupported-algorithm if the given hash algorithm is not
+ : @error hash:UNSUPPORTED-ALGORITHM if the given hash algorithm is not
  :  supported
  :)
 declare function hmac:compute-binary(
