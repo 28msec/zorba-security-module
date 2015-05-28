@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+MESSAGE(STATUS "")
+MESSAGE(STATUS "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+MESSAGE(STATUS "Configuring external module <security>")
+MESSAGE(STATUS "-------------------------------------------------------------")
+MESSAGE(STATUS "")
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT (zorba_security_module)
@@ -27,6 +33,10 @@ IF (NOT OPENSSL_FOUND)
   MESSAGE(WARNING "Could not find the OpenSSL library and development headers")
   MESSAGE(WARNING "Not building security modules")
   SET_PROPERTY (GLOBAL PROPERTY ZORBA_PROJECT_UNAVAILABLE 1)
+  
+  MESSAGE(STATUS "")
+  MESSAGE(STATUS "-------------------------------------------------------------")  
+  MESSAGE(STATUS "Configuration FAILED for external module <security>")
 
 ELSE (NOT OPENSSL_FOUND)
 
@@ -34,7 +44,13 @@ ELSE (NOT OPENSSL_FOUND)
   
   ADD_TEST_DIRECTORY("${PROJECT_SOURCE_DIR}/test")
   ADD_SUBDIRECTORY("src")
+  
+  MESSAGE(STATUS "")
+  MESSAGE(STATUS "-------------------------------------------------------------")
+  MESSAGE(STATUS "Configuration SUCCEEDED for external module <security>")
 
 ENDIF (NOT OPENSSL_FOUND)
 
 DONE_DECLARING_ZORBA_URIS()
+
+MESSAGE(STATUS "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
